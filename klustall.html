@@ -1086,18 +1086,18 @@
                 <section class="card">
                     <div class="card-header">Personal Details</div>
                     <div class="card-body">
-                        <div class="data-row"><span class="label">Register Number</span> 99240041007</div>
-                        <div class="data-row"><span class="label">Name</span> LIKITH RAJ P</div>
-                        <div class="data-row"><span class="label">Degree</span> B.Tech CSE</div>
+                        <div class="data-row"><span class="label">Register Number</span> <span id="profileReg">—</span></div>
+                        <div class="data-row"><span class="label">Name</span> <span id="profileName">—</span></div>
+                        <div class="data-row"><span class="label">Degree</span> <span id="profileDegree">—</span></div>
                     </div>
                 </section>
 
                 <section class="card">
                     <div class="card-header">Contact Information</div>
                     <div class="card-body">
-                        <div class="data-row"><span class="label">Date of Birth</span> 22/02/2007</div>
-                        <div class="data-row"><span class="label">Gender</span> Male</div>
-                        <div class="data-row"><span class="label">Address</span> Chittoor, Andhra Pradesh</div>
+                        <div class="data-row"><span class="label">Date of Birth</span> <span id="profileDOB">—</span></div>
+                        <div class="data-row"><span class="label">Gender</span> <span id="profileGender">—</span></div>
+                        <div class="data-row"><span class="label">Address</span> <span id="profileAddress">—</span></div>
                     </div>
                 </section>
             </div>
@@ -1491,16 +1491,10 @@
             }
 
             const db = getUsersDB();
-            // Default password is the register number if user not in DB
-            const correctPass = db[reg] || reg;
+            const user = db[reg];
 
-            if (pass === correctPass) {
-                // If this is the first time login, save to DB
-                if (!db[reg]) {
-                    db[reg] = reg;
-                    saveUsersDB(db);
-                }
-
+            // Check if user exists and password is correct
+            if (user && user.password === pass) {
                 // Handle "Remember Me" - Save to suggestions dataset
                 if (remember) {
                     saveCredToDataset(reg, pass);
@@ -1509,6 +1503,10 @@
                 sessionStorage.setItem("sis_auth", "true");
                 sessionStorage.setItem("sis_user", reg);
                 showPortal(reg);
+            } else if (!user) {
+                err.textContent = "❌ Register Number not found. Please Sign Up first.";
+                err.classList.add("visible");
+                document.getElementById("passInput").value = "";
             } else {
                 err.textContent = "❌ Incorrect password. Please try again.";
                 err.classList.add("visible");
@@ -1520,6 +1518,7 @@
             document.getElementById("loginOverlay").classList.add("hidden");
             document.getElementById("portal").classList.add("visible");
             document.getElementById("topbarUser").textContent = "👤 " + user;
+            loadUserProfile(); // Load user profile data when portal opens
             setTimeout(() => {
                 document.getElementById("loginOverlay").style.display = "none";
             }, 420);
@@ -1582,15 +1581,33 @@
                 return;
             }
 
-            // Save new user
-            db[reg] = reg; // Default password is the register number
+            // Save new user with all details
+            db[reg] = {
+                password: reg, // Default password is the register number
+                name: name,
+                degree: degree,
+                dob: dob,
+                gender: gender,
+                address: address,
+                registrationDate: new Date().toLocaleDateString()
+            };
             saveUsersDB(db);
 
-            // Show success message
-            alert("✅ Registration successful! You can now Sign In with your Register Number.");
+            // Show success message and auto-login
+            alert("✅ Registration successful! Logging you in...");
             closeSignupForm();
-            document.getElementById("regInput").value = reg;
-            document.getElementById("passInput").focus();
+            
+            // Auto-login the new user
+            sessionStorage.setItem("sis_auth", "true");
+            sessionStorage.setItem("sis_user", reg);
+            
+            // Close login overlay and show portal
+            document.getElementById("loginOverlay").classList.add("hidden");
+            document.getElementById("portal").classList.add("visible");
+            document.getElementById("topbarUser").textContent = "👤 " + reg;
+            setTimeout(() => {
+                document.getElementById("loginOverlay").style.display = "none";
+            }, 420);
         });
 
         // Enter key submits login
@@ -1751,6 +1768,23 @@
         }
 
         // ── Tab Switching Logic ──
+        function loadUserProfile() {
+            const user = sessionStorage.getItem("sis_user");
+            if (!user) return;
+
+            const db = getUsersDB();
+            const userData = db[user];
+
+            if (userData) {
+                document.getElementById("profileReg").textContent = user;
+                document.getElementById("profileName").textContent = userData.name || "—";
+                document.getElementById("profileDegree").textContent = userData.degree || "—";
+                document.getElementById("profileDOB").textContent = userData.dob || "—";
+                document.getElementById("profileGender").textContent = userData.gender || "—";
+                document.getElementById("profileAddress").textContent = userData.address || "—";
+            }
+        }
+
         function switchTab(tab) {
             // Hide all views
             document.querySelectorAll('.container').forEach(c => {
@@ -1778,6 +1812,11 @@
                 document.getElementById(viewId).classList.remove('view-section');
                 document.getElementById(viewId).classList.add('active');
                 if (navId) document.getElementById(navId).classList.add('active');
+
+                // Load profile data when switching to profile tab
+                if (tab === 'profile') {
+                    loadUserProfile();
+                }
 
                 // Special clear for reset tab
                 if (tab === 'reset') {
