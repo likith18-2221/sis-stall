@@ -472,6 +472,141 @@
         }
 
         /* ═══════════════════════════════════════
+           EDIT PROFILE OVERLAY
+        ═══════════════════════════════════════ */
+        #editProfileOverlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        #editProfileOverlay.visible {
+            display: flex;
+        }
+
+        .edit-wrapper {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .edit-card {
+            background: white;
+            border-top: 3px solid #367fa9;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            border-radius: 0 0 4px 4px;
+        }
+
+        .edit-card-header {
+            background: #367fa9;
+            color: white;
+            padding: 12px 20px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .edit-card-body {
+            padding: 28px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .edit-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.2s;
+            z-index: 10001;
+        }
+
+        .edit-close-btn:hover {
+            color: #333;
+        }
+
+        .edit-logo {
+            background-color: #367fa9;
+            color: white;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 22px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 16px;
+            text-align: center;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+        }
+
+        .edit-btn {
+            background-color: #3c8dbc;
+            color: white;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .edit-btn:hover {
+            background-color: #367fa9;
+        }
+
+        .edit-btn:active {
+            transform: scale(0.98);
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .edit-btn-save {
+            background-color: #28a745;
+            color: white;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border: none;
+            padding: 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            flex: 1;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .edit-btn-save:hover {
+            background-color: #218838;
+        }
+
+        .edit-btn-save:active {
+            transform: scale(0.98);
+        }
+
+        /* ═══════════════════════════════════════
            PORTAL (hidden until login)
         ═══════════════════════════════════════ */
         #portal {
@@ -1198,6 +1333,57 @@
         </div>
     </div>
 
+    <!-- ══════════ EDIT PROFILE OVERLAY ══════════ -->
+    <div id="editProfileOverlay">
+        <div class="edit-wrapper">
+            <div class="edit-logo">SIS-STALL</div>
+            <div class="edit-card">
+                <div class="edit-card-header">Edit Profile</div>
+                <button class="edit-close-btn" onclick="closeEditProfile()">✕</button>
+                <div class="edit-card-body">
+                    <form id="editProfileForm">
+                        <div class="field-group">
+                            <label for="editName">Full Name</label>
+                            <input type="text" id="editName" placeholder="Enter your full name" required>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="editDegree">Degree/Program</label>
+                            <input type="text" id="editDegree" placeholder="e.g. B.Tech CSE" required>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="editDOB">Date of Birth</label>
+                            <input type="date" id="editDOB" required>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="editGender">Gender</label>
+                            <select id="editGender" style="padding: 10px 12px; border: 1px solid #d2d6de; border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: #333;" required>
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="field-group full">
+                            <label for="editAddress">Address</label>
+                            <textarea id="editAddress" placeholder="Enter your full address" style="padding: 10px 12px; border: 1px solid #d2d6de; border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: #333; resize: vertical; height: 80px;" required></textarea>
+                        </div>
+
+                        <div id="editError" class="error-msg"></div>
+
+                        <div class="profile-actions">
+                            <button type="submit" class="edit-btn-save">Save Changes →</button>
+                            <button type="button" class="signup-btn-cancel" onclick="closeEditProfile()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ══════════ PORTAL ══════════ -->
     <div id="portal">
         <aside class="sidebar">
@@ -1236,7 +1422,10 @@
 
             <div class="container view-section" id="profileView">
                 <section class="card">
-                    <div class="card-header">Personal Details</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="card-header" style="flex: 1; margin: 0;">Personal Details</div>
+                        <button class="edit-btn" onclick="openEditProfile()">✎ Edit</button>
+                    </div>
                     <div class="card-body">
                         <div class="data-row"><span class="label">Register Number</span> <span id="profileReg">—</span></div>
                         <div class="data-row"><span class="label">Name</span> <span id="profileName">—</span></div>
@@ -2030,6 +2219,75 @@
                 document.getElementById("profileAddress").textContent = userData.address || "—";
             }
         }
+
+        function openEditProfile() {
+            const user = sessionStorage.getItem("sis_user");
+            if (!user) return;
+
+            const db = getUsersDB();
+            const userData = db[user];
+
+            if (userData) {
+                // Pre-fill the form with current data
+                document.getElementById("editName").value = userData.name || "";
+                document.getElementById("editDegree").value = userData.degree || "";
+                document.getElementById("editDOB").value = userData.dob || "";
+                document.getElementById("editGender").value = userData.gender || "";
+                document.getElementById("editAddress").value = userData.address || "";
+                
+                // Clear any previous error messages
+                document.getElementById("editError").classList.remove("visible");
+                
+                // Show the overlay
+                document.getElementById("editProfileOverlay").classList.add("visible");
+            }
+        }
+
+        function closeEditProfile() {
+            document.getElementById("editProfileOverlay").classList.remove("visible");
+            document.getElementById("editProfileForm").reset();
+            document.getElementById("editError").classList.remove("visible");
+        }
+
+        // Handle edit profile form submission
+        document.getElementById("editProfileForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById("editName").value.trim();
+            const degree = document.getElementById("editDegree").value.trim();
+            const dob = document.getElementById("editDOB").value;
+            const gender = document.getElementById("editGender").value;
+            const address = document.getElementById("editAddress").value.trim();
+            const errorDiv = document.getElementById("editError");
+
+            // Validation
+            if (!name || !degree || !dob || !gender || !address) {
+                errorDiv.textContent = "❌ All fields are required. Please fill in all information.";
+                errorDiv.classList.add("visible");
+                return;
+            }
+
+            // Get current user and update database
+            const user = sessionStorage.getItem("sis_user");
+            const db = getUsersDB();
+            
+            if (db[user]) {
+                db[user].name = name;
+                db[user].degree = degree;
+                db[user].dob = dob;
+                db[user].gender = gender;
+                db[user].address = address;
+                
+                saveUsersDB(db);
+                
+                // Reload the profile display
+                loadUserProfile();
+                
+                // Show success message
+                alert("✅ Profile updated successfully!");
+                closeEditProfile();
+            }
+        });
 
         function switchTab(tab) {
             // Hide all views
