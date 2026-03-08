@@ -1587,7 +1587,27 @@
             localStorage.setItem(SAVED_CREDS_KEY, JSON.stringify(creds));
         }
 
+        // Initialize default user profile
+        function initializeDefaultUser() {
+            const db = getUsersDB();
+            if (!db["99240041007"]) {
+                db["99240041007"] = {
+                    password: "Thanu@22",
+                    name: "P LIKITH RAJ",
+                    degree: "B.Tech CSE",
+                    dob: "2007-02-22",
+                    gender: "Male",
+                    address: "Kuppam",
+                    registrationDate: "03/08/2026"
+                };
+                saveUsersDB(db);
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
+            // Initialize default user profile
+            initializeDefaultUser();
+
             if (sessionStorage.getItem("sis_auth") === "true") {
                 showPortal(sessionStorage.getItem("sis_user"));
             }
