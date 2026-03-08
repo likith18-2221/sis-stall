@@ -977,7 +977,7 @@
 
                     <button class="login-btn" onclick="doLogin()">Sign In →</button>
 
-                    <p class="login-note">Enter your 11-digit register number as both username and password.</p>
+                    <p class="login-note">Enter your 11-digit register number and the password you created during sign-up.</p>
 
                     <div class="signup-divider">OR</div>
 
@@ -1032,6 +1032,16 @@
                         <div class="field-group full">
                             <label for="signupAddress">Address</label>
                             <textarea id="signupAddress" placeholder="Enter your full address" style="padding: 10px 12px; border: 1px solid #d2d6de; border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: #333; resize: vertical; height: 80px;" required></textarea>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="signupPassword">Create Password</label>
+                            <input type="password" id="signupPassword" placeholder="Enter a strong password (min 6 characters)" required>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="signupConfirmPassword">Confirm Password</label>
+                            <input type="password" id="signupConfirmPassword" placeholder="Re-enter your password" required>
                         </div>
 
                         <div id="signupError" class="error-msg"></div>
@@ -1558,6 +1568,8 @@
             const dob = document.getElementById("signupDOB").value;
             const gender = document.getElementById("signupGender").value;
             const address = document.getElementById("signupAddress").value.trim();
+            const password = document.getElementById("signupPassword").value;
+            const confirmPassword = document.getElementById("signupConfirmPassword").value;
             const errorDiv = document.getElementById("signupError");
 
             // Validation
@@ -1567,9 +1579,23 @@
                 return;
             }
 
-            if (!name || !degree || !dob || !gender || !address) {
+            if (!name || !degree || !dob || !gender || !address || !password || !confirmPassword) {
                 errorDiv.textContent = "❌ All fields are required. Please fill in all information.";
                 errorDiv.classList.add("visible");
+                return;
+            }
+
+            if (password.length < 6) {
+                errorDiv.textContent = "⚠️ Password must be at least 6 characters long.";
+                errorDiv.classList.add("visible");
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                errorDiv.textContent = "❌ Passwords do not match. Please try again.";
+                errorDiv.classList.add("visible");
+                document.getElementById("signupPassword").value = "";
+                document.getElementById("signupConfirmPassword").value = "";
                 return;
             }
 
@@ -1583,7 +1609,7 @@
 
             // Save new user with all details
             db[reg] = {
-                password: reg, // Default password is the register number
+                password: password, // User's custom password
                 name: name,
                 degree: degree,
                 dob: dob,
