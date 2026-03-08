@@ -167,6 +167,207 @@
             text-align: center;
         }
 
+        .signup-divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 24px 0 20px 0;
+            color: #ccc;
+            font-size: 12px;
+        }
+
+        .signup-divider::before,
+        .signup-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background-color: #e5e5e5;
+        }
+
+        .signup-block {
+            background-color: #f9f9f9;
+            border: 1px solid #e5e5e5;
+            padding: 16px;
+            border-radius: 3px;
+            text-align: center;
+        }
+
+        .signup-text {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .signup-link {
+            background-color: #28a745;
+            color: white;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 3px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s, transform 0.1s;
+            display: inline-block;
+        }
+
+        .signup-link:hover {
+            background-color: #218838;
+        }
+
+        .signup-link:active {
+            transform: scale(0.98);
+        }
+
+        /* ═══════════════════════════════════════
+           SIGNUP OVERLAY
+        ═══════════════════════════════════════ */
+        #signupOverlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        #signupOverlay.visible {
+            display: flex;
+        }
+
+        .signup-wrapper {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+        }
+
+        .signup-card {
+            background: white;
+            border-top: 3px solid #28a745;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            border-radius: 0 0 4px 4px;
+        }
+
+        .signup-card-header {
+            background: #28a745;
+            color: white;
+            padding: 12px 20px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .signup-card-body {
+            padding: 28px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .signup-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .signup-form-grid.full {
+            grid-column: 1 / -1;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .signup-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .signup-btn-submit {
+            background-color: #28a745;
+            color: white;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border: none;
+            padding: 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            flex: 1;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .signup-btn-submit:hover {
+            background-color: #218838;
+        }
+
+        .signup-btn-submit:active {
+            transform: scale(0.98);
+        }
+
+        .signup-btn-cancel {
+            background-color: #6c757d;
+            color: white;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border: none;
+            padding: 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            flex: 1;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .signup-btn-cancel:hover {
+            background-color: #5a6268;
+        }
+
+        .signup-btn-cancel:active {
+            transform: scale(0.98);
+        }
+
+        .signup-logo {
+            background-color: #367fa9;
+            color: white;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 22px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 16px;
+            text-align: center;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+        }
+
         /* ═══════════════════════════════════════
            PORTAL (hidden until login)
         ═══════════════════════════════════════ */
@@ -777,6 +978,69 @@
                     <button class="login-btn" onclick="doLogin()">Sign In →</button>
 
                     <p class="login-note">Enter your 11-digit register number as both username and password.</p>
+
+                    <div class="signup-divider">OR</div>
+
+                    <div class="signup-block">
+                        <p class="signup-text">New User?</p>
+                        <button class="signup-link" onclick="doSignUp()">Sign Up →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════ SIGNUP OVERLAY ══════════ -->
+    <div id="signupOverlay">
+        <div class="signup-wrapper">
+            <div class="signup-logo">SIS-STALL</div>
+            <div class="signup-card">
+                <div class="signup-card-header">New User Registration</div>
+                <button class="close-btn" onclick="closeSignupForm()">✕</button>
+                <div class="signup-card-body">
+                    <form id="signupForm">
+                        <div class="field-group">
+                            <label for="signupReg">Register Number (11 digits)</label>
+                            <input type="text" id="signupReg" maxlength="11" placeholder="e.g. 99240041007" required>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="signupName">Full Name</label>
+                            <input type="text" id="signupName" placeholder="Enter your full name" required>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="signupDegree">Degree/Program</label>
+                            <input type="text" id="signupDegree" placeholder="e.g. B.Tech CSE" required>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="signupDOB">Date of Birth</label>
+                            <input type="date" id="signupDOB" required>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="signupGender">Gender</label>
+                            <select id="signupGender" style="padding: 10px 12px; border: 1px solid #d2d6de; border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: #333;" required>
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="field-group full">
+                            <label for="signupAddress">Address</label>
+                            <textarea id="signupAddress" placeholder="Enter your full address" style="padding: 10px 12px; border: 1px solid #d2d6de; border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: #333; resize: vertical; height: 80px;" required></textarea>
+                        </div>
+
+                        <div id="signupError" class="error-msg"></div>
+
+                        <div class="signup-actions">
+                            <button type="submit" class="signup-btn-submit">Register →</button>
+                            <button type="button" class="signup-btn-cancel" onclick="closeSignupForm()">Cancel</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -1274,6 +1538,60 @@
             document.getElementById("passInput").value = "";
             document.getElementById("loginError").classList.remove("visible");
         }
+
+        function doSignUp() {
+            document.getElementById("signupOverlay").classList.add("visible");
+        }
+
+        function closeSignupForm() {
+            document.getElementById("signupOverlay").classList.remove("visible");
+            document.getElementById("signupForm").reset();
+            document.getElementById("signupError").classList.remove("visible");
+        }
+
+        // Handle signup form submission
+        document.getElementById("signupForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            
+            const reg = document.getElementById("signupReg").value.trim();
+            const name = document.getElementById("signupName").value.trim();
+            const degree = document.getElementById("signupDegree").value.trim();
+            const dob = document.getElementById("signupDOB").value;
+            const gender = document.getElementById("signupGender").value;
+            const address = document.getElementById("signupAddress").value.trim();
+            const errorDiv = document.getElementById("signupError");
+
+            // Validation
+            if (reg.length !== 11) {
+                errorDiv.textContent = "⚠️ Register Number must be exactly 11 digits.";
+                errorDiv.classList.add("visible");
+                return;
+            }
+
+            if (!name || !degree || !dob || !gender || !address) {
+                errorDiv.textContent = "❌ All fields are required. Please fill in all information.";
+                errorDiv.classList.add("visible");
+                return;
+            }
+
+            // Check if register number already exists
+            const db = getUsersDB();
+            if (db[reg]) {
+                errorDiv.textContent = "⚠️ This Register Number is already registered. Please Sign In instead.";
+                errorDiv.classList.add("visible");
+                return;
+            }
+
+            // Save new user
+            db[reg] = reg; // Default password is the register number
+            saveUsersDB(db);
+
+            // Show success message
+            alert("✅ Registration successful! You can now Sign In with your Register Number.");
+            closeSignupForm();
+            document.getElementById("regInput").value = reg;
+            document.getElementById("passInput").focus();
+        });
 
         // Enter key submits login
         document.addEventListener("keydown", e => {
