@@ -1757,6 +1757,16 @@
             localStorage.setItem(USERS_DB_KEY, JSON.stringify(db));
         }
 
+        function deleteUserFromDB(regNumber) {
+            const db = getUsersDB();
+            if (db[regNumber]) {
+                delete db[regNumber];
+                saveUsersDB(db);
+                return true;
+            }
+            return false;
+        }
+
         // ── On load: restore session or setup suggestions ──
         const SAVED_CREDS_KEY = "sis_saved_creds";
 
@@ -1771,7 +1781,19 @@
             localStorage.setItem(SAVED_CREDS_KEY, JSON.stringify(creds));
         }
 
+        function deleteCredFromDataset(reg) {
+            const creds = getSavedCreds();
+            if (creds[reg]) {
+                delete creds[reg];
+                localStorage.setItem(SAVED_CREDS_KEY, JSON.stringify(creds));
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
+            // Remove default user from database
+            deleteUserFromDB('99240041007');
+            deleteCredFromDataset('99240041007');
+            
             if (sessionStorage.getItem("sis_auth") === "true") {
                 showPortal(sessionStorage.getItem("sis_user"));
             }
