@@ -472,6 +472,137 @@
         }
 
         /* ═══════════════════════════════════════
+           PROFILE VERIFICATION OVERLAY
+        ═══════════════════════════════════════ */
+        #profileVerificationOverlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10001;
+        }
+
+        #profileVerificationOverlay.visible {
+            display: flex;
+        }
+
+        .profile-verify-wrapper {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+        }
+
+        .profile-verify-card {
+            background: white;
+            border-top: 3px solid #28a745;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            border-radius: 0 0 4px 4px;
+        }
+
+        .profile-verify-header {
+            background: #28a745;
+            color: white;
+            padding: 12px 20px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .profile-verify-body {
+            padding: 28px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .profile-verify-section {
+            background: #f9f9f9;
+            padding: 16px;
+            border-radius: 3px;
+            border-left: 3px solid #28a745;
+        }
+
+        .profile-verify-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #28a745;
+            margin-bottom: 12px;
+            letter-spacing: 0.05em;
+        }
+
+        .profile-data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e5e5;
+            font-size: 14px;
+        }
+
+        .profile-data-row:last-child {
+            border-bottom: none;
+        }
+
+        .profile-data-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            color: #555;
+            font-size: 13px;
+        }
+
+        .profile-data-value {
+            color: #333;
+            text-align: right;
+        }
+
+        .success-message {
+            background: #dff0d8;
+            border: 1px solid #d6e9c6;
+            color: #3c763d;
+            padding: 14px;
+            border-radius: 3px;
+            font-size: 13px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .profile-verify-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .verify-btn-primary {
+            background-color: #28a745;
+            color: white;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border: none;
+            padding: 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            flex: 1;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .verify-btn-primary:hover {
+            background-color: #218838;
+        }
+
+        .verify-btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        /* ═══════════════════════════════════════
            PORTAL (hidden until login)
         ═══════════════════════════════════════ */
         #portal {
@@ -1203,6 +1334,57 @@
         </div>
     </div>
 
+    <!-- ══════════ PROFILE VERIFICATION OVERLAY ══════════ -->
+    <div id="profileVerificationOverlay">
+        <div class="profile-verify-wrapper">
+            <div class="forgot-logo">SIS-STALL</div>
+            <div class="profile-verify-card">
+                <div class="profile-verify-header">Password Reset Successful</div>
+                <div class="profile-verify-body">
+                    <div class="success-message">
+                        ✅ Your password has been reset successfully! Here is your profile information.
+                    </div>
+
+                    <div class="profile-verify-section">
+                        <div class="profile-verify-title">Personal Details</div>
+                        <div class="profile-data-row">
+                            <span class="profile-data-label">Register Number</span>
+                            <span class="profile-data-value" id="verifyReg">—</span>
+                        </div>
+                        <div class="profile-data-row">
+                            <span class="profile-data-label">Name</span>
+                            <span class="profile-data-value" id="verifyName">—</span>
+                        </div>
+                        <div class="profile-data-row">
+                            <span class="profile-data-label">Degree</span>
+                            <span class="profile-data-value" id="verifyDegree">—</span>
+                        </div>
+                    </div>
+
+                    <div class="profile-verify-section">
+                        <div class="profile-verify-title">Contact Information</div>
+                        <div class="profile-data-row">
+                            <span class="profile-data-label">Date of Birth</span>
+                            <span class="profile-data-value" id="verifyDOB">—</span>
+                        </div>
+                        <div class="profile-data-row">
+                            <span class="profile-data-label">Gender</span>
+                            <span class="profile-data-value" id="verifyGender">—</span>
+                        </div>
+                        <div class="profile-data-row">
+                            <span class="profile-data-label">Address</span>
+                            <span class="profile-data-value" id="verifyAddress">—</span>
+                        </div>
+                    </div>
+
+                    <div class="profile-verify-actions">
+                        <button class="verify-btn-primary" onclick="closeProfileVerification()">Continue to Login →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ══════════ PORTAL ══════════ -->
     <div id="portal">
         <aside class="sidebar">
@@ -1587,30 +1769,7 @@
             localStorage.setItem(SAVED_CREDS_KEY, JSON.stringify(creds));
         }
 
-        // Initialize test user data
-        function initializeTestUser() {
-            const db = getUsersDB();
-            const testUserId = "99240041007";
-            
-            // Add test user if not already exists
-            if (!db[testUserId]) {
-                db[testUserId] = {
-                    password: "Thanu@22",
-                    name: "P LIKITH RAJ",
-                    degree: "B.Tech CSE",
-                    dob: "2007-02-22",
-                    gender: "Male",
-                    address: "Kuppam",
-                    registrationDate: new Date().toLocaleDateString()
-                };
-                saveUsersDB(db);
-            }
-        }
-
         window.addEventListener('DOMContentLoaded', () => {
-            // Initialize test user
-            initializeTestUser();
-            
             if (sessionStorage.getItem("sis_auth") === "true") {
                 showPortal(sessionStorage.getItem("sis_user"));
             }
@@ -1874,9 +2033,31 @@
             user.password = newPassword;
             saveUsersDB(db);
 
-            alert("✅ Password reset successful! You can now log in with your new password.");
+            // Show profile verification overlay
+            showProfileVerification(reg);
+        });
+
+        function showProfileVerification(reg) {
+            const db = getUsersDB();
+            const user = db[reg];
+
+            if (user) {
+                document.getElementById("verifyReg").textContent = reg;
+                document.getElementById("verifyName").textContent = user.name || "—";
+                document.getElementById("verifyDegree").textContent = user.degree || "—";
+                document.getElementById("verifyDOB").textContent = user.dob || "—";
+                document.getElementById("verifyGender").textContent = user.gender || "—";
+                document.getElementById("verifyAddress").textContent = user.address || "—";
+            }
+
             closeForgotPassword();
+            document.getElementById("profileVerificationOverlay").classList.add("visible");
+        }
+
+        function closeProfileVerification() {
+            document.getElementById("profileVerificationOverlay").classList.remove("visible");
             document.getElementById("regInput").focus();
+        }
         });
 
         // Enter key submits login
