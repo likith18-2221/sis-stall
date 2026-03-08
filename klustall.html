@@ -369,6 +369,109 @@
         }
 
         /* ═══════════════════════════════════════
+           FORGOT PASSWORD OVERLAY
+        ═══════════════════════════════════════ */
+        #forgotPasswordOverlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        #forgotPasswordOverlay.visible {
+            display: flex;
+        }
+
+        .forgot-wrapper {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+        }
+
+        .forgot-card {
+            background: white;
+            border-top: 3px solid #ffc107;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            border-radius: 0 0 4px 4px;
+        }
+
+        .forgot-card-header {
+            background: #ffc107;
+            color: #333;
+            padding: 12px 20px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .forgot-card-body {
+            padding: 28px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .forgot-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .forgot-close-btn:hover {
+            color: #333;
+        }
+
+        .forgot-btn-reset {
+            background-color: #ffc107;
+            color: #333;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border: none;
+            padding: 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .forgot-btn-reset:hover {
+            background-color: #e6b800;
+        }
+
+        .forgot-btn-reset:active {
+            transform: scale(0.98);
+        }
+
+        .forgot-logo {
+            background-color: #dc3545;
+            color: white;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 22px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 16px;
+            text-align: center;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+        }
+
+        /* ═══════════════════════════════════════
            PORTAL (hidden until login)
         ═══════════════════════════════════════ */
         #portal {
@@ -977,7 +1080,10 @@
 
                     <button class="login-btn" onclick="doLogin()">Sign In →</button>
 
-                    <p class="login-note">Enter your 11-digit register number and the password you created during sign-up.</p>
+                    <p class="login-note">
+                        Enter your 11-digit register number and the password you created during sign-up.
+                        <br><a href="#" onclick="openForgotPassword(event)" style="color: #3c8dbc; text-decoration: none; font-weight: 600;">Forgot Password?</a>
+                    </p>
 
                     <div class="signup-divider">OR</div>
 
@@ -1049,6 +1155,47 @@
                         <div class="signup-actions">
                             <button type="submit" class="signup-btn-submit">Register →</button>
                             <button type="button" class="signup-btn-cancel" onclick="closeSignupForm()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════ FORGOT PASSWORD OVERLAY ══════════ -->
+    <div id="forgotPasswordOverlay">
+        <div class="forgot-wrapper">
+            <div class="forgot-logo">SIS-STALL</div>
+            <div class="forgot-card">
+                <div class="forgot-card-header">Password Recovery</div>
+                <button class="forgot-close-btn" onclick="closeForgotPassword()">✕</button>
+                <div class="forgot-card-body">
+                    <form id="forgotPasswordForm">
+                        <div class="field-group">
+                            <label for="forgotReg">Register Number (11 digits)</label>
+                            <input type="text" id="forgotReg" maxlength="11" placeholder="e.g. 99240041007" required>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="forgotDOB">Date of Birth (for verification)</label>
+                            <input type="date" id="forgotDOB" required>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="forgotNewPassword">New Password</label>
+                            <input type="password" id="forgotNewPassword" placeholder="Enter a new password (min 6 characters)" required>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="forgotConfirmPassword">Confirm Password</label>
+                            <input type="password" id="forgotConfirmPassword" placeholder="Re-enter your password" required>
+                        </div>
+
+                        <div id="forgotError" class="error-msg"></div>
+
+                        <div class="signup-actions">
+                            <button type="submit" class="forgot-btn-reset">Reset Password →</button>
+                            <button type="button" class="signup-btn-cancel" onclick="closeForgotPassword()">Cancel</button>
                         </div>
                     </form>
                 </div>
@@ -1634,6 +1781,79 @@
             setTimeout(() => {
                 document.getElementById("loginOverlay").style.display = "none";
             }, 420);
+        });
+
+        function openForgotPassword(event) {
+            event.preventDefault();
+            document.getElementById("forgotPasswordOverlay").classList.add("visible");
+        }
+
+        function closeForgotPassword() {
+            document.getElementById("forgotPasswordOverlay").classList.remove("visible");
+            document.getElementById("forgotPasswordForm").reset();
+            document.getElementById("forgotError").classList.remove("visible");
+        }
+
+        // Handle forgot password form submission
+        document.getElementById("forgotPasswordForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            
+            const reg = document.getElementById("forgotReg").value.trim();
+            const dob = document.getElementById("forgotDOB").value;
+            const newPassword = document.getElementById("forgotNewPassword").value;
+            const confirmPassword = document.getElementById("forgotConfirmPassword").value;
+            const errorDiv = document.getElementById("forgotError");
+
+            // Validation
+            if (reg.length !== 11) {
+                errorDiv.textContent = "⚠️ Register Number must be exactly 11 digits.";
+                errorDiv.classList.add("visible");
+                return;
+            }
+
+            if (!dob || !newPassword || !confirmPassword) {
+                errorDiv.textContent = "❌ All fields are required.";
+                errorDiv.classList.add("visible");
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                errorDiv.textContent = "⚠️ Password must be at least 6 characters long.";
+                errorDiv.classList.add("visible");
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                errorDiv.textContent = "❌ Passwords do not match. Please try again.";
+                errorDiv.classList.add("visible");
+                document.getElementById("forgotNewPassword").value = "";
+                document.getElementById("forgotConfirmPassword").value = "";
+                return;
+            }
+
+            // Check if user exists and verify DOB
+            const db = getUsersDB();
+            const user = db[reg];
+
+            if (!user) {
+                errorDiv.textContent = "❌ Register Number not found in the system.";
+                errorDiv.classList.add("visible");
+                return;
+            }
+
+            if (user.dob !== dob) {
+                errorDiv.textContent = "❌ Date of Birth does not match our records. Please try again.";
+                errorDiv.classList.add("visible");
+                return;
+            }
+
+            // Update password
+            user.password = newPassword;
+            saveUsersDB(db);
+
+            alert("✅ Password reset successful! You can now log in with your new password.");
+            closeForgotPassword();
+            document.getElementById("regInput").focus();
         });
 
         // Enter key submits login
