@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Stall — Hyderabadi Delights</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #111;
+            color: #fff;
+        }
+
+        /* ─── NAVBAR ─── */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 40px;
+            background: rgba(17, 17, 17, .85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, .08);
+        }
+
+        nav .logo {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        nav .logo span {
+            color: #ff6b35;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 28px;
+        }
+
+        nav ul li a {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: .3s;
+        }
+
+        nav ul li a:hover {
+            color: #ff6b35;
+        }
+
+        /* ─── HERO ─── */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(160deg, #1a0a00 0%, #111 40%, #0d1117 100%);
+            padding: 120px 20px 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 107, 53, .15), transparent 70%);
+            top: -100px;
+            right: -100px;
+            border-radius: 50%;
+        }
+
+        .hero h1 {
+            font-size: clamp(36px, 6vw, 64px);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, #ff6b35, #f7c948);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #999;
+            max-width: 520px;
+            margin-bottom: 36px;
+        }
+
+        .hero-btn {
+            display: inline-block;
+            padding: 14px 36px;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #ff6b35, #e8531a);
+            color: #fff;
+            font-weight: 700;
+            font-size: 15px;
+            text-decoration: none;
+            box-shadow: 0 8px 30px rgba(255, 107, 53, .35);
+            transition: .3s;
+        }
+
+        .hero-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(255, 107, 53, .5);
+        }
+
+        /* ─── MENU SECTION ─── */
+        .menu {
+            padding: 80px 40px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .menu .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .menu .section-title h2 {
+            font-size: 36px;
+            font-weight: 800;
+        }
+
+        .menu .section-title h2 span {
+            color: #ff6b35;
+        }
+
+        .menu .section-title p {
+            color: #888;
+            margin-top: 8px;
+            font-size: 15px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: #1a1a1a;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, .06);
+            transition: transform .4s, box-shadow .4s;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, .5);
+        }
+
+        .card img {
+            width: 100%;
+            height: 260px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        .card-body h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .card-body .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .tag-spicy {
+            background: rgba(255, 107, 53, .15);
+            color: #de0000b6;
+        }
+
+        .tag-cool {
+            background: rgba(56, 189, 248, .15);
+            color: #005f87;
+        }
+
+        .tag-grill {
+            background: rgba(250, 204, 21, .15);
+            color: #fbc900;
+        }
+
+        .card-body p {
+            color: #888;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .price {
+            font-size: 22px;
+            font-weight: 800;
+            color: #ff6b35;
+        }
+
+        /* ─── FOOTER ─── */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid rgba(255, 255, 255, .06);
+            color: #555;
+            font-size: 13px;
+        }
+
+        /* ─── RESPONSIVE ─── */
+        @media(max-width:600px) {
+            nav {
+                padding: 14px 20px;
+            }
+
+            nav ul {
+                gap: 16px;
+            }
+
+            .menu {
+                padding: 60px 20px;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav>
+        <div class="logo"><span>Food</span>Stall</div>
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#menu">Menu</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero" id="home">
+        <h1>X- Miss Ina<br><span>Taste miss Avadhu</span></h1>
+        <p>From smoky kebabs to aromatic dum biryani and ice-cold drinks — every bite tells a story.</p>
+        <a href="#menu" class="hero-btn">Explore Menu ↓</a>
+    </section>
+
+    <!-- MENU -->
+    <section class="menu" id="menu">
+        <div class="section-title">
+            <h2>Our <span>Menu</span></h2>
+            <p>Hand-picked favourites from our kitchen to your plate</p>
+        </div>
+
+        <div class="cards">
+
+            <!-- Card 1 — Biryani -->
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=1280&q=90"
+                    alt="Chicken Dum Biryani">
+                <div class="card-body">
+                    <span class="tag tag-spicy">🔥 Spicy</span>
+                    <h3>Chicken Dum Biryani</h3>
+                    <p>Slow-cooked Hyderabadi biryani layered with fragrant basmati rice, tender chicken, and aromatic
+                        spices.</p>
+                    <div class="price">₹160</div>
+                </div>
+            </div>
+
+            <!-- Card 2 — Kebab -->
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=1280&q=90" alt="Chicken Kebab">
+                <div class="card-body">
+                    <span class="tag tag-grill">🍢 Grilled</span>
+                    <h3>Chicken Seekh Kebab</h3>
+                    <p>Charcoal-grilled seekh kebabs marinated in a blend of spices — smoky, juicy, and irresistible.
+                    </p>
+                    <div class="price">₹120</div>
+                </div>
+            </div>
+
+            <!-- Card 3 — Cool Drink -->
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1554866585-cd94860890b7?w=1280&q=90" alt="Thums Up">
+                <div class="card-body">
+                    <span class="tag tag-cool">❄️ Chilled</span>
+                    <h3>Thums Up</h3>
+                    <p>Ice-cold Thums Up to wash it all down — the perfect partner for spicy food.</p>
+                    <div class="price">₹30</div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer id="contact">
+        <p>📍 KARE Food Stall &nbsp;|&nbsp; 📞 +91 9652792122&nbsp;|&nbsp; © 2026 FoodStall@KARE</p>
+    </footer>
+
+</body>
+
+</html>

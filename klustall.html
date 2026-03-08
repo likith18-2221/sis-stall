@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIS-STALL Portal</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: #ecf0f5;
+            letter-spacing: 0.01em;
+            min-height: 100vh;
+        }
+
+        /* ═══════════════════════════════════════
+           LOGIN OVERLAY
+        ═══════════════════════════════════════ */
+        #loginOverlay {
+            position: fixed;
+            inset: 0;
+            background-color: #ecf0f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.4s ease;
+        }
+
+        #loginOverlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+        }
+
+        .login-logo {
+            background-color: #367fa9;
+            color: white;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 22px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 16px;
+            text-align: center;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .login-card {
+            background: white;
+            border-top: 3px solid #3c8dbc;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+            border-radius: 0 0 4px 4px;
+        }
+
+        .login-card-header {
+            background: #3c8dbc;
+            color: white;
+            padding: 12px 20px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .login-card-body {
+            padding: 28px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .field-group label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            letter-spacing: 0.02em;
+        }
+
+        .field-group input {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            padding: 10px 12px;
+            border: 1px solid #d2d6de;
+            border-radius: 3px;
+            outline: none;
+            color: #333;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            letter-spacing: 0.04em;
+        }
+
+        .field-group input:focus {
+            border-color: #3c8dbc;
+            box-shadow: 0 0 0 3px rgba(60, 141, 188, 0.15);
+        }
+
+        .field-group input::placeholder {
+            color: #bbb;
+        }
+
+        .error-msg {
+            display: none;
+            background: #f2dede;
+            border: 1px solid #ebccd1;
+            color: #a94442;
+            padding: 10px 14px;
+            border-radius: 3px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .error-msg.visible {
+            display: block;
+        }
+
+        .login-btn {
+            background-color: #3c8dbc;
+            color: white;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border: none;
+            padding: 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .login-btn:hover {
+            background-color: #367fa9;
+        }
+
+        .login-btn:active {
+            transform: scale(0.98);
+        }
+
+        .login-note {
+            font-size: 12px;
+            color: #999;
+            text-align: center;
+        }
+
+        /* ═══════════════════════════════════════
+           PORTAL (hidden until login)
+        ═══════════════════════════════════════ */
+        #portal {
+            display: none;
+            min-height: 100vh;
+            flex-direction: row;
+        }
+
+        #portal.visible {
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 230px;
+            background-color: #222d32;
+            min-height: 100vh;
+            color: #b8c7ce;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            background-color: #367fa9;
+            color: white;
+            padding: 15px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+            text-align: center;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .nav-item {
+            padding: 12px 15px;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+        }
+
+        .nav-item:hover {
+            background-color: #1e282c;
+            color: white;
+            border-left-color: #3c8dbc;
+        }
+
+        .nav-section-title {
+            padding: 12px 15px 6px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #4a6272;
+            border-top: 1px solid #2c3b43;
+            margin-top: 8px;
+        }
+
+        .nav-logout {
+            margin-top: auto;
+            border-top: 1px solid #2c3b43;
+            color: #e07070;
+            cursor: pointer;
+        }
+
+        .nav-logout:hover {
+            background-color: #3b1a1a !important;
+            color: #ff8080 !important;
+            border-left-color: #e05555 !important;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            background-color: #3c8dbc;
+            height: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: white;
+        }
+
+        .container {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .card {
+            background: white;
+            border-top: 3px solid #3c8dbc;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background: #3c8dbc;
+            color: white;
+            padding: 10px 15px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .card-body {
+            padding: 15px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .notification-bar {
+            background-color: #00a65a;
+            color: white;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 3px;
+        }
+
+        .data-row {
+            display: flex;
+            border-bottom: 1px solid #f4f4f4;
+            padding: 8px 0;
+        }
+
+        .label {
+            width: 40%;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            color: #555;
+            letter-spacing: 0.02em;
+        }
+
+        /* Navigation Visibility */
+        .view-section {
+            display: none !important;
+        }
+
+        .view-section.active {
+            display: grid !important;
+        }
+
+        .nav-item.active {
+            background-color: #1e282c;
+            color: white;
+            border-left-color: #3c8dbc;
+        }
+
+        /* Reset Password Form Styling */
+        .reset-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 400px;
+        }
+
+        .reset-form .field-group label {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .reset-form input {
+            padding: 10px;
+            border: 1px solid #d2d6de;
+            border-radius: 3px;
+        }
+
+        .reset-btn {
+            background-color: #3c8dbc;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: 0.05em;
+        }
+
+        .reset-btn:hover {
+            background-color: #367fa9;
+        }
+
+        .status-msg {
+            padding: 10px;
+            border-radius: 3px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .status-msg.success {
+            display: block;
+            background-color: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+        }
+
+        .status-msg.error {
+            display: block;
+            background-color: #f2dede;
+            color: #a94442;
+            border: 1px solid #ebccd1;
+        }
+
+        /* Stall Grid Refinement */
+        .stall-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, 100px);
+            gap: 15px;
+            padding: 20px 0;
+            justify-content: center;
+        }
+
+        .stall-block {
+            background: #2ecc71;
+            border: 2px solid #27ae60;
+            aspect-ratio: 1/1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(46, 204, 113, 0.15);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            gap: 5px;
+        }
+
+        .stall-block:hover {
+            transform: scale(1.08);
+            background-color: #27ae60;
+            box-shadow: 0 6px 15px rgba(39, 174, 96, 0.4);
+            border-color: #1e8449;
+        }
+
+        .stall-block:hover .stall-name,
+        .stall-block:hover .stall-status {
+            color: white;
+        }
+
+        .stall-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+            font-family: 'Space Grotesk', sans-serif;
+            line-height: 1;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .stall-status {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        /* Sold Stall Aesthetic */
+        .stall-block.sold {
+            background: #e74c3c;
+            border-color: #c0392b;
+            box-shadow: 0 4px 6px rgba(231, 76, 60, 0.15);
+            cursor: not-allowed;
+        }
+
+        .stall-block.sold:hover {
+            background-color: #c0392b;
+            box-shadow: 0 6px 15px rgba(192, 57, 43, 0.4);
+            border-color: #962d22;
+            transform: scale(1.02);
+        }
+
+        /* Facilities Table Styling */
+        .facilities-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .facilities-table th,
+        .facilities-table td {
+            padding: 18px 20px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .facilities-table th {
+            background-color: #3c8dbc;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 14px;
+        }
+
+        .facilities-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .facilities-table tr:hover {
+            background-color: #f9f9fb;
+        }
+
+        .price-cell {
+            font-weight: 700;
+            color: #3c8dbc;
+            font-size: 18px;
+            white-space: nowrap;
+        }
+
+        .facility-desc {
+            color: #666;
+            font-size: 13px;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .pay-btn {
+            background-color: #3c8dbc;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            transition: background-color 0.2s, transform 0.1s;
+            margin-left: 15px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .pay-btn:hover {
+            background-color: #367fa9;
+            transform: translateY(-1px);
+        }
+
+        .pay-btn:active {
+            transform: translateY(0);
+        }
+
+        .price-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Duration Selector Styling */
+        .duration-selector {
+            display: flex;
+            background: #f0f2f5;
+            padding: 4px;
+            border-radius: 8px;
+            margin-right: 15px;
+            border: 1px solid #e0e4e8;
+        }
+
+        .duration-btn {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            color: #666;
+            transition: all 0.2s;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .duration-btn.active {
+            background: white;
+            color: #3c8dbc;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .duration-btn:not(.active):hover {
+            color: #333;
+        }
+
+        /* Payment View Styling */
+        .payment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 10px 0;
+        }
+
+        .payment-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+            border: 1px solid #eee;
+        }
+
+        .payment-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .payment-card h3 {
+            margin-top: 0;
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .payment-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .payment-form input,
+        .payment-form select {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .btn-pay-action {
+            background-color: #3c8dbc;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .btn-pay-action:hover {
+            background-color: #367fa9;
+        }
+
+        .bank-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .bank-item {
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .bank-item:hover {
+            background: #f0f7ff;
+            border-color: #3c8dbc;
+        }
+
+        .qr-placeholder {
+            width: 150px;
+            height: 150px;
+            background: #eee;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: 12px;
+            color: #999;
+            border: 2px dashed #ccc;
+        }
+
+        /* Login Suggestions */
+        .suggestions-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            max-height: 150px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item:hover {
+            background-color: #f0f7ff;
+            color: #3c8dbc;
+        }
+
+        /* Blinking Animation & Highlight */
+        @keyframes blink-glow {
+            0% {
+                background-color: transparent;
+            }
+
+            50% {
+                background-color: rgba(60, 141, 188, 0.2);
+            }
+
+            100% {
+                background-color: transparent;
+            }
+        }
+
+        .blink-highlight {
+            animation: blink-glow 1s ease-in-out infinite;
+            border-bottom: 2px solid #3c8dbc !important;
+        }
+
+        .blink-badge {
+            display: none;
+            background: #ff4757;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            margin-left: 10px;
+            vertical-align: middle;
+            animation: blink-fade 0.8s infinite alternate;
+        }
+
+        @keyframes blink-fade {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0.4;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ══════════ LOGIN OVERLAY ══════════ -->
+    <div id="loginOverlay">
+        <div class="login-wrapper">
+            <div class="login-logo">SIS-STALL</div>
+            <div class="login-card">
+                <div class="login-card-header">Student Portal — Sign In</div>
+                <div class="login-card-body">
+
+                    <div class="field-group" style="position: relative;">
+                        <label for="regInput">Register Number (11 digits)</label>
+                        <input type="text" id="regInput" maxlength="11" placeholder="e.g. 99240041007"
+                            autocomplete="off">
+                        <div id="loginSuggestions" class="suggestions-dropdown"></div>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="passInput">Password</label>
+                        <input type="password" id="passInput" placeholder="Enter your password" autocomplete="off">
+                    </div>
+
+                    <div class="remember-group"
+                        style="margin-bottom: 20px; display: flex; align-items: center; gap: 8px; font-size: 14px; color: #555;">
+                        <input type="checkbox" id="rememberMe" style="width: 16px; height: 16px; cursor: pointer;">
+                        <label for="rememberMe" style="cursor: pointer;">Remember Me / Save Password</label>
+                    </div>
+
+                    <div class="error-msg" id="loginError">
+                        ❌ Invalid Register Number or Password. Please try again.
+                    </div>
+
+                    <button class="login-btn" onclick="doLogin()">Sign In →</button>
+
+                    <p class="login-note">Enter your 11-digit register number as both username and password.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════ PORTAL ══════════ -->
+    <div id="portal">
+        <aside class="sidebar">
+            <div class="logo">SIS-STALL</div>
+            <div id="nav-dashboard" class="nav-item active" onclick="switchTab('dashboard')">🏠 Dashboard</div>
+            <div id="nav-profile" class="nav-item" onclick="switchTab('profile')">👤 My Profile</div>
+            <div id="nav-blueprint" class="nav-item" onclick="switchTab('blueprint')">�️ Blueprint</div>
+            <div class="nav-item">�📍 Stall Location</div>
+            <div id="nav-stalls" class="nav-item" onclick="switchTab('stalls')">🔢 Stall Number</div>
+            <div id="nav-yourstall" class="nav-item" onclick="switchTab('yourstall')">⛺ Your Stall</div>
+            <div id="nav-facilities" class="nav-item" onclick="switchTab('facilities')">🏪 Stall Facilities</div>
+            <div class="nav-section-title">Payments</div>
+            <div id="nav-payments" class="nav-item" onclick="switchTab('payments')">💳 Payment Options</div>
+            <div id="nav-reset" class="nav-item" onclick="switchTab('reset')">🔑 Reset Password</div>
+            <div class="nav-item nav-logout" onclick="doLogout()">🚪 Logout</div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <span>☰</span>
+                <span id="topbarUser">👤 —</span>
+            </header>
+
+            <div class="container active" id="dashboardView">
+                <div class="full-width notification-bar">
+                    Notifications: System updates are live.
+                </div>
+                <!-- Welcome Card or Dashboard content could go here if different -->
+                <section class="card full-width">
+                    <div class="card-header">Dashboard Overview</div>
+                    <div class="card-body">
+                        Welcome to SIS-STALL. Please select "My Profile" to view your personal and contact details.
+                    </div>
+                </section>
+            </div>
+
+            <div class="container view-section" id="profileView">
+                <section class="card">
+                    <div class="card-header">Personal Details</div>
+                    <div class="card-body">
+                        <div class="data-row"><span class="label">Register Number</span> 99240041007</div>
+                        <div class="data-row"><span class="label">Name</span> LIKITH RAJ P</div>
+                        <div class="data-row"><span class="label">Degree</span> B.Tech CSE</div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <div class="card-header">Contact Information</div>
+                    <div class="card-body">
+                        <div class="data-row"><span class="label">Date of Birth</span> 22/02/2007</div>
+                        <div class="data-row"><span class="label">Gender</span> Male</div>
+                        <div class="data-row"><span class="label">Address</span> Chittoor, Andhra Pradesh</div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="container view-section" id="blueprintView">
+                <section class="card full-width">
+                    <div class="card-header">Stall Blueprint - TIFAC CORE Block Location</div>
+                    <div class="card-body"
+                        style="padding: 0; overflow: hidden; border-radius: 0 0 4px 4px; display: flex;">
+                        <iframe width="100%" height="500" frameborder="0" scrolling="no" marginheight="0"
+                            marginwidth="0"
+                            src="https://maps.google.com/maps?q=Kalasalingam%20University%20TIFAC%20CORE%20Block&t=k&z=18&ie=UTF8&iwloc=&output=embed"
+                            style="border: 0;"></iframe>
+                    </div>
+                </section>
+            </div>
+
+            <div class="container view-section" id="resetPasswordView">
+                <section class="card full-width">
+                    <div class="card-header">Account Security — Reset Password</div>
+                    <div class="card-body">
+                        <div class="reset-form">
+                            <div class="field-group">
+                                <label>Current Password</label>
+                                <input type="password" id="oldPassInput" placeholder="Enter current password">
+                            </div>
+                            <div class="field-group">
+                                <label>New Password</label>
+                                <input type="password" id="newPassInput" placeholder="Enter new password">
+                            </div>
+                            <div class="field-group">
+                                <label>Confirm New Password</label>
+                                <input type="password" id="confirmPassInput" placeholder="Confirm new password">
+                            </div>
+                            <div id="resetStatus" class="status-msg"></div>
+                            <button class="reset-btn" onclick="handlePasswordReset()">Update Password</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="container view-section" id="stallNumberView">
+                <section class="card full-width">
+                    <div class="card-header">Stall Layout — Overview</div>
+                    <div class="card-body">
+                        <div class="stall-grid">
+                            <div class="stall-block" onclick="highlightStall('normal')">
+                                <span class="stall-name">1</span>
+                                <span class="stall-status">Stall Present</span>
+                            </div>
+                            <div class="stall-block" onclick="highlightStall('normal')">
+                                <span class="stall-name">2</span>
+                                <span class="stall-status">Stall Present</span>
+                            </div>
+                            <div class="stall-block" onclick="highlightStall('normal')">
+                                <span class="stall-name">3</span>
+                                <span class="stall-status">Stall Present</span>
+                            </div>
+                            <div class="stall-block sold">
+                                <span class="stall-name">4</span>
+                                <span class="stall-status">Stall Sold</span>
+                            </div>
+                            <div class="stall-block" onclick="highlightStall('normal')">
+                                <span class="stall-name">5</span>
+                                <span class="stall-status">Stall Present</span>
+                            </div>
+                            <div class="stall-block" onclick="highlightStall('normal')">
+                                <span class="stall-name">6</span>
+                                <span class="stall-status">Stall Present</span>
+                            </div>
+                            <div class="stall-block" onclick="highlightStall('regular')">
+                                <span class="stall-name">7</span>
+                                <span class="stall-status">Stall Present</span>
+                            </div>
+                            <div class="stall-block sold">
+                                <span class="stall-name">8</span>
+                                <span class="stall-status">Stall Sold</span>
+                            </div>
+                            <div class="stall-block" onclick="highlightStall('regular')">
+                                <span class="stall-name">9</span>
+                                <span class="stall-status">Stall Present</span>
+                            </div>
+                            <div class="stall-block" onclick="highlightStall('regular')">
+                                <span class="stall-name">10</span>
+                                <span class="stall-status">Stall Present</span>
+                            </div>
+                            <div class="stall-block" onclick="highlightStall('regular')">
+                                <span class="stall-name">11</span>
+                                <span class="stall-status">Stall Present</span>
+                            </div>
+                            <div class="stall-block sold">
+                                <span class="stall-name">12</span>
+                                <span class="stall-status">Stall Sold</span>
+                            </div>
+                            <div class="stall-block" onclick="highlightStall('heavy')">
+                                <span class="stall-name">13</span>
+                                <span class="stall-status">Stall Present</span>
+                            </div>
+                            <div class="stall-block" onclick="highlightStall('heavy')">
+                                <span class="stall-name">14</span>
+                                <span class="stall-status">Stall Present</span>
+                            </div>
+                            <div class="stall-block" onclick="highlightStall('heavy')">
+                                <span class="stall-name">15</span>
+                                <span class="stall-status">Stall Present</span>
+                            </div>
+                            <div class="stall-block" onclick="highlightStall('heavy')">
+                                <span class="stall-name">16</span>
+                                <span class="stall-status">Stall Present</span>
+                            </div>
+                            <div class="stall-block" onclick="highlightStall('heavy')">
+                                <span class="stall-name">17</span>
+                                <span class="stall-status">Stall Present</span>
+                            </div>
+                            <div class="stall-block" onclick="highlightStall('heavy')">
+                                <span class="stall-name">18</span>
+                                <span class="stall-status">Stall Present</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="container view-section" id="yourStallView">
+                <section class="card full-width">
+                    <div class="card-header">Your Stall — Status & Details</div>
+                    <div class="card-body"
+                        style="min-height: 200px; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center;">
+                        <div id="noStallMessage" style="display: none;">
+                            <div style="font-size: 48px; margin-bottom: 15px; color: #ccc;">⛺</div>
+                            <h3 style="color: #555; font-family: 'Space Grotesk', sans-serif; margin-bottom: 8px;">No
+                                Stall Booked Yet</h3>
+                            <p style="color: #888; font-size: 14px;">Explore our stall options and book one from the
+                                <strong>Stall Facilities</strong> page.
+                            </p>
+                        </div>
+                        <div id="bookedStallDetails"
+                            style="display: block; width: 100%; max-width: 400px; background: #f8fbff; border: 1px solid #d2e3fc; border-radius: 8px; padding: 25px;">
+                            <h3
+                                style="color: #3c8dbc; font-family: 'Space Grotesk', sans-serif; margin-bottom: 15px; border-bottom: 2px solid #e1effe; padding-bottom: 10px;">
+                                Booking Confirmed! ✅</h3>
+                            <div class="data-row"
+                                style="justify-content: space-between; border-bottom: none; padding: 5px 0;"><span
+                                    class="label">Stall No:</span> <strong>12</strong></div>
+                            <div class="data-row"
+                                style="justify-content: space-between; border-bottom: none; padding: 5px 0;"><span
+                                    class="label">Stall Type:</span> <strong id="ysType">Heavy Electric Stall</strong>
+                            </div>
+                            <div class="data-row"
+                                style="justify-content: space-between; border-bottom: none; padding: 5px 0;"><span
+                                    class="label">Duration:</span> <strong id="ysDays">2 Days</strong></div>
+                            <div class="data-row"
+                                style="justify-content: space-between; border-bottom: none; padding: 5px 0;"><span
+                                    class="label">Amount Paid:</span> <strong id="ysAmount">₹ 11,000</strong></div>
+                            <div class="data-row"
+                                style="justify-content: space-between; border-bottom: none; padding: 5px 0;"><span
+                                    class="label">Payment Method:</span> <strong id="ysMethod">Net Banking</strong>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="container view-section" id="stallFacilitiesView">
+                <section class="card full-width">
+                    <div class="card-header">Stall Types & Pricing Details</div>
+                    <div class="card-body">
+                        <table class="facilities-table">
+                            <thead>
+                                <tr>
+                                    <th>Stall Type & Facilities</th>
+                                    <th>Price (Per Day)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr id="normalStallRow" data-base-price="4000">
+                                    <td>
+                                        <strong>NORMAL STALL</strong>
+                                        <span id="normalStallBadge" class="blink-badge">SELECTED</span>
+                                        <span class="facility-desc">(WITHOUT FACILITIES)</span>
+                                    </td>
+                                    <td>
+                                        <div class="price-container">
+                                            <div class="duration-selector">
+                                                <button class="duration-btn active" onclick="updatePrice(this, 1)">1
+                                                    Day</button>
+                                                <button class="duration-btn" onclick="updatePrice(this, 2)">2
+                                                    Days</button>
+                                            </div>
+                                            <span class="price-cell">₹ 4,000</span>
+                                            <button class="pay-btn"
+                                                onclick="handlePaymentViaFacilities(this, 'Normal Stall (No Facilities)')">Pay
+                                                Now</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr id="regularStallRow" data-base-price="5000">
+                                    <td>
+                                        <strong>REGULAR STALL</strong>
+                                        <span id="regularStallBadge" class="blink-badge">SELECTED</span>
+                                        <span class="facility-desc">(2 TABLES, 2 CHAIRS, TUBELIGHT, WATER SUPPLY)</span>
+                                    </td>
+                                    <td>
+                                        <div class="price-container">
+                                            <div class="duration-selector">
+                                                <button class="duration-btn active" onclick="updatePrice(this, 1)">1
+                                                    Day</button>
+                                                <button class="duration-btn" onclick="updatePrice(this, 2)">2
+                                                    Days</button>
+                                            </div>
+                                            <span class="price-cell">₹ 5,000</span>
+                                            <button class="pay-btn"
+                                                onclick="handlePaymentViaFacilities(this, 'Regular Stall (With Facilities)')">Pay
+                                                Now</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr id="heavyStallRow" data-base-price="5500">
+                                    <td>
+                                        <strong>HEAVY ELECTRIC STALL</strong>
+                                        <span id="heavyStallBadge" class="blink-badge">SELECTED</span>
+                                        <span class="facility-desc">(2 TABLES, 2 CHAIRS, TUBELIGHT, WATER SUPPLY,
+                                            ELECTRIC SUPPLY)</span>
+                                    </td>
+                                    <td>
+                                        <div class="price-container">
+                                            <div class="duration-selector">
+                                                <button class="duration-btn active" onclick="updatePrice(this, 1)">1
+                                                    Day</button>
+                                                <button class="duration-btn" onclick="updatePrice(this, 2)">2
+                                                    Days</button>
+                                            </div>
+                                            <span class="price-cell">₹ 5,500</span>
+                                            <button class="pay-btn"
+                                                onclick="handlePaymentViaFacilities(this, 'Heavy Electric Stall')">Pay
+                                                Now</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <div class="container view-section" id="paymentOptionsView">
+                <section class="card full-width">
+                    <div class="card-header">Secure Checkout — Payment Options</div>
+                    <div class="card-body">
+                        <div id="paymentSummary"
+                            style="margin-bottom: 20px; padding: 15px; background: #f8fbff; border-radius: 8px; border-left: 4px solid #3c8dbc; display: none;">
+                            <strong>Selected:</strong> <span id="payStallName"></span> | <strong>Amount:</strong> <span
+                                id="payStallAmount"></span>
+                        </div>
+                        <div class="payment-grid">
+                            <!-- Block 1: Net Banking -->
+                            <div class="payment-card">
+                                <h3>🏦 Net Banking</h3>
+                                <div class="bank-list">
+                                    <div class="bank-item">SBI</div>
+                                    <div class="bank-item">HDFC</div>
+                                    <div class="bank-item">ICICI</div>
+                                    <div class="bank-item">Axis</div>
+                                    <div class="bank-item">KOTAK</div>
+                                    <div class="bank-item">Others</div>
+                                </div>
+                                <button class="btn-pay-action" style="width: 100%; margin-top: 20px;"
+                                    onclick="processFinalPayment('Net Banking')">Proceed to Bank</button>
+                            </div>
+
+                            <!-- Block 2: Card Payment -->
+                            <div class="payment-card">
+                                <h3>💳 Card Payment</h3>
+                                <div class="payment-form">
+                                    <input type="text" placeholder="Card Number (XXXX XXXX XXXX XXXX)">
+                                    <div style="display: flex; gap: 10px;">
+                                        <input type="text" placeholder="MM/YY" style="flex: 1;">
+                                        <input type="password" placeholder="CVV" style="width: 80px;">
+                                    </div>
+                                    <input type="text" placeholder="Card Holder Name">
+                                    <button class="btn-pay-action" onclick="processFinalPayment('Card')">Pay with
+                                        Card</button>
+                                </div>
+                            </div>
+
+                            <!-- Block 3: UPI / Google Pay -->
+                            <div class="payment-card">
+                                <h3>📱 UPI / Google Pay</h3>
+                                <div class="payment-form">
+                                    <div class="qr-placeholder">
+                                        Scan QR Code
+                                    </div>
+                                    <p style="text-align: center; color: #999; font-size: 12px; margin: 5px 0;">OR</p>
+                                    <input type="text" placeholder="Enter UPI ID (e.g. user@okaxis)">
+                                    <button class="btn-pay-action" onclick="processFinalPayment('UPI')">Pay via
+                                        UPI</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ── "Database" initialized in localStorage ──
+        const USERS_DB_KEY = "sis_users_db";
+
+        function getUsersDB() {
+            const db = localStorage.getItem(USERS_DB_KEY);
+            return db ? JSON.parse(db) : {};
+        }
+
+        function saveUsersDB(db) {
+            localStorage.setItem(USERS_DB_KEY, JSON.stringify(db));
+        }
+
+        // ── On load: restore session or setup suggestions ──
+        const SAVED_CREDS_KEY = "sis_saved_creds";
+
+        function getSavedCreds() {
+            const data = localStorage.getItem(SAVED_CREDS_KEY);
+            return data ? JSON.parse(data) : {};
+        }
+
+        function saveCredToDataset(reg, pass) {
+            const creds = getSavedCreds();
+            creds[reg] = pass;
+            localStorage.setItem(SAVED_CREDS_KEY, JSON.stringify(creds));
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (sessionStorage.getItem("sis_auth") === "true") {
+                showPortal(sessionStorage.getItem("sis_user"));
+            }
+
+            // Setup suggestion listener
+            const regInput = document.getElementById("regInput");
+            const suggestions = document.getElementById("loginSuggestions");
+
+            if (regInput && suggestions) {
+                regInput.addEventListener('input', () => {
+                    const val = regInput.value.trim();
+                    if (val.length < 1) {
+                        suggestions.style.display = "none";
+                        return;
+                    }
+
+                    const creds = getSavedCreds();
+                    const matches = Object.keys(creds).filter(k => k.startsWith(val));
+
+                    if (matches.length > 0) {
+                        suggestions.innerHTML = "";
+                        matches.forEach(m => {
+                            const div = document.createElement("div");
+                            div.className = "suggestion-item";
+                            div.textContent = m;
+                            div.onclick = () => {
+                                regInput.value = m;
+                                document.getElementById("passInput").value = creds[m];
+                                suggestions.style.display = "none";
+                                // Clear error if selection made
+                                document.getElementById("loginError").classList.remove("visible");
+                            };
+                            suggestions.appendChild(div);
+                        });
+                        suggestions.style.display = "block";
+                    } else {
+                        suggestions.style.display = "none";
+                    }
+                });
+
+                // Close suggestions on blur (with delay for click)
+                regInput.addEventListener('blur', () => {
+                    setTimeout(() => { suggestions.style.display = "none"; }, 200);
+                });
+            }
+        });
+
+        function doLogin() {
+            const reg = document.getElementById("regInput").value.trim();
+            const pass = document.getElementById("passInput").value;
+            const remember = document.getElementById("rememberMe").checked;
+            const err = document.getElementById("loginError");
+
+            if (reg.length !== 11) {
+                err.textContent = "⚠️ Register Number must be exactly 11 digits.";
+                err.classList.add("visible");
+                return;
+            }
+
+            const db = getUsersDB();
+            // Default password is the register number if user not in DB
+            const correctPass = db[reg] || reg;
+
+            if (pass === correctPass) {
+                // If this is the first time login, save to DB
+                if (!db[reg]) {
+                    db[reg] = reg;
+                    saveUsersDB(db);
+                }
+
+                // Handle "Remember Me" - Save to suggestions dataset
+                if (remember) {
+                    saveCredToDataset(reg, pass);
+                }
+
+                sessionStorage.setItem("sis_auth", "true");
+                sessionStorage.setItem("sis_user", reg);
+                showPortal(reg);
+            } else {
+                err.textContent = "❌ Incorrect password. Please try again.";
+                err.classList.add("visible");
+                document.getElementById("passInput").value = "";
+            }
+        }
+
+        function showPortal(user) {
+            document.getElementById("loginOverlay").classList.add("hidden");
+            document.getElementById("portal").classList.add("visible");
+            document.getElementById("topbarUser").textContent = "👤 " + user;
+            setTimeout(() => {
+                document.getElementById("loginOverlay").style.display = "none";
+            }, 420);
+        }
+
+        function doLogout() {
+            sessionStorage.removeItem("sis_auth");
+            sessionStorage.removeItem("sis_user");
+
+            document.getElementById("loginOverlay").style.display = "flex";
+            requestAnimationFrame(() => {
+                document.getElementById("loginOverlay").classList.remove("hidden");
+            });
+            document.getElementById("portal").classList.remove("visible");
+            document.getElementById("regInput").value = "";
+            document.getElementById("passInput").value = "";
+            document.getElementById("loginError").classList.remove("visible");
+        }
+
+        // Enter key submits login
+        document.addEventListener("keydown", e => {
+            if (e.key === "Enter" && !document.getElementById("portal").classList.contains("visible")) {
+                doLogin();
+            }
+        });
+
+        // Clear error on typing
+        ["regInput", "passInput"].forEach(id => {
+            document.getElementById(id).addEventListener("input", () =>
+                document.getElementById("loginError").classList.remove("visible"));
+        });
+
+        function handlePasswordReset() {
+            const user = sessionStorage.getItem("sis_user");
+            const oldPass = document.getElementById("oldPassInput").value;
+            const newPass = document.getElementById("newPassInput").value;
+            const confirmPass = document.getElementById("confirmPassInput").value;
+            const status = document.getElementById("resetStatus");
+
+            const db = getUsersDB();
+            const currentPass = db[user];
+
+            status.classList.remove("success", "error");
+            status.style.display = 'block';
+
+            if (oldPass !== currentPass) {
+                status.textContent = "❌ Current password does not match.";
+                status.classList.add("error");
+                return;
+            }
+
+            if (!newPass || newPass.length < 4) {
+                status.textContent = "❌ New password must be at least 4 characters.";
+                status.classList.add("error");
+                return;
+            }
+
+            if (newPass !== confirmPass) {
+                status.textContent = "❌ Passwords do not match.";
+                status.classList.add("error");
+                return;
+            }
+
+            // Update DB
+            db[user] = newPass;
+            saveUsersDB(db);
+
+            // Sync with suggestions dataset if user is present
+            const savedCreds = getSavedCreds();
+            if (savedCreds[user]) {
+                savedCreds[user] = newPass;
+                localStorage.setItem(SAVED_CREDS_KEY, JSON.stringify(savedCreds));
+            }
+
+            status.textContent = "✅ Password updated successfully!";
+            status.classList.add("success");
+
+            // Clear inputs
+            document.getElementById("oldPassInput").value = "";
+            document.getElementById("newPassInput").value = "";
+            document.getElementById("confirmPassInput").value = "";
+        }
+
+        // ── Facilities Logic ──
+        function updatePrice(btn, days) {
+            const row = btn.closest('tr');
+            const basePrice = parseInt(row.getAttribute('data-base-price'));
+            const priceCell = row.querySelector('.price-cell');
+            const buttons = btn.parentElement.querySelectorAll('.duration-btn');
+
+            // Reset buttons
+            buttons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Calculate and show new price
+            const totalPrice = basePrice * days;
+            priceCell.textContent = '₹ ' + totalPrice.toLocaleString();
+
+            // Store selected days in row for payment handler
+            row.setAttribute('data-selected-days', days);
+            row.setAttribute('data-total-price', totalPrice);
+        }
+
+        function handlePaymentViaFacilities(btn, type) {
+            const row = btn.closest('tr');
+            const days = row.getAttribute('data-selected-days') || 1;
+            const price = row.getAttribute('data-total-price') || row.getAttribute('data-base-price');
+
+            handlePayment(`${type} (${days} Day${days > 1 ? 's' : ''})`, parseInt(price));
+        }
+
+        function handlePayment(type, amount) {
+            const confirmed = confirm(`Proceed to pay ₹${amount.toLocaleString()} for ${type}?`);
+            if (confirmed) {
+                // Show payment selection view
+                switchTab('payments');
+                // Show summary bar
+                const summary = document.getElementById('paymentSummary');
+                summary.style.display = 'block';
+                document.getElementById('payStallName').textContent = type;
+                document.getElementById('payStallAmount').textContent = '₹' + amount.toLocaleString();
+            }
+        }
+
+        function processFinalPayment(method) {
+            alert(`Processing your ${method} payment... Please do not refresh the page.`);
+            setTimeout(() => {
+                alert("Payment Successful! Your stall has been booked.");
+
+                // Update Your Stall view
+                document.getElementById('noStallMessage').style.display = 'none';
+                document.getElementById('bookedStallDetails').style.display = 'block';
+                document.getElementById('ysType').textContent = document.getElementById('payStallName').textContent;
+                document.getElementById('ysAmount').textContent = document.getElementById('payStallAmount').textContent;
+                document.getElementById('ysMethod').textContent = method;
+
+                switchTab('yourstall');
+                document.getElementById('paymentSummary').style.display = 'none';
+            }, 2000);
+        }
+
+        // ── Navigation & Highlighting Logic ──
+        function highlightStall(category) {
+            switchTab('facilities');
+
+            const mapping = {
+                'normal': { rowId: 'normalStallRow', badgeId: 'normalStallBadge' },
+                'regular': { rowId: 'regularStallRow', badgeId: 'regularStallBadge' },
+                'heavy': { rowId: 'heavyStallRow', badgeId: 'heavyStallBadge' }
+            };
+
+            const target = mapping[category];
+            if (!target) return;
+
+            const row = document.getElementById(target.rowId);
+            const badge = document.getElementById(target.badgeId);
+
+            if (row && badge) {
+                // Remove any existing highlights
+                document.querySelectorAll('.blink-highlight').forEach(r => r.classList.remove('blink-highlight'));
+                document.querySelectorAll('.blink-badge').forEach(b => b.style.display = 'none');
+
+                row.classList.add('blink-highlight');
+                badge.style.display = 'inline-block';
+
+                // Scroll to row smoothly
+                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Remove highlight after 5 seconds
+                setTimeout(() => {
+                    row.classList.remove('blink-highlight');
+                    badge.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // ── Tab Switching Logic ──
+        function switchTab(tab) {
+            // Hide all views
+            document.querySelectorAll('.container').forEach(c => {
+                c.classList.remove('active');
+                c.classList.add('view-section');
+            });
+
+            // Remove active class from nav items
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+            // Show selected view
+            const views = {
+                'dashboard': ['dashboardView', 'nav-dashboard'],
+                'profile': ['profileView', 'nav-profile'],
+                'blueprint': ['blueprintView', 'nav-blueprint'],
+                'reset': ['resetPasswordView', 'nav-reset'],
+                'stalls': ['stallNumberView', 'nav-stalls'],
+                'yourstall': ['yourStallView', 'nav-yourstall'],
+                'facilities': ['stallFacilitiesView', 'nav-facilities'],
+                'payments': ['paymentOptionsView', 'nav-payments']
+            };
+
+            if (views[tab]) {
+                const [viewId, navId] = views[tab];
+                document.getElementById(viewId).classList.remove('view-section');
+                document.getElementById(viewId).classList.add('active');
+                if (navId) document.getElementById(navId).classList.add('active');
+
+                // Special clear for reset tab
+                if (tab === 'reset') {
+                    document.getElementById('resetStatus').style.display = 'none';
+                    document.getElementById('resetStatus').classList.remove('success', 'error');
+                }
+            }
+        }
+    </script>
+
+</body>
+
+</html>
