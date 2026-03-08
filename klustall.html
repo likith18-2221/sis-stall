@@ -2024,26 +2024,20 @@
                 return;
             }
 
-            // Update password with timestamp tracking
-            const oldPassword = user.password;
+            // Store the new password in database for this registration number
             user.password = newPassword;
-            user.lastPasswordChange = new Date().toLocaleString();
-            
-            // Add to password change history if not exists
-            if (!user.passwordChangeHistory) {
-                user.passwordChangeHistory = [];
-            }
-            user.passwordChangeHistory.push({
-                changedAt: new Date().toLocaleString(),
-                method: "Forgot Password Recovery"
-            });
-            
-            // Limit history to last 5 changes
-            if (user.passwordChangeHistory.length > 5) {
-                user.passwordChangeHistory = user.passwordChangeHistory.slice(-5);
-            }
-            
             saveUsersDB(db);
+            
+            // Verify password was saved to database
+            const dbVerify = getUsersDB();
+            const verifyUser = dbVerify[reg];
+            const passwordSaved = (verifyUser && verifyUser.password === newPassword);
+            
+            if (!passwordSaved) {
+                errorDiv.textContent = "⚠️ Error saving password. Please try again.";
+                errorDiv.classList.add("visible");
+                return;
+            }
 
             // Auto-login the user
             sessionStorage.setItem("sis_auth", "true");
@@ -2059,7 +2053,8 @@
                 document.getElementById("loginOverlay").style.display = "none";
             }, 420);
             
-            alert("✅ Password reset successful! You are now logged in.");
+            // Alert with explicit confirmation that password is saved and will be used for future logins
+            alert("✅ Password reset successful!\n\n📝 Your new password has been saved to the system.\n\n🔐 This is now your official password for Registration Number: " + reg + "\n\nYou can use this password to log in anytime in the future.");
         });
 
         // Enter key submits login
@@ -2083,19 +2078,19 @@
             const status = document.getElementById("resetStatus");
 
             const db = getUsersDB();
-            const userData = db[user];
+            const currentPass = db[user];
 
             status.classList.remove("success", "error");
             status.style.display = 'block';
 
-            if (!userData || oldPass !== userData.password) {
+            if (oldPass !== currentPass) {
                 status.textContent = "❌ Current password does not match.";
                 status.classList.add("error");
                 return;
             }
 
-            if (!newPass || newPass.length < 6) {
-                status.textContent = "❌ New password must be at least 6 characters.";
+            if (!newPass || newPass.length < 4) {
+                status.textContent = "❌ New password must be at least 4 characters.";
                 status.classList.add("error");
                 return;
             }
@@ -2106,24 +2101,8 @@
                 return;
             }
 
-            // Update password with timestamp tracking
-            userData.password = newPass;
-            userData.lastPasswordChange = new Date().toLocaleString();
-            
-            // Add to password change history if not exists
-            if (!userData.passwordChangeHistory) {
-                userData.passwordChangeHistory = [];
-            }
-            userData.passwordChangeHistory.push({
-                changedAt: new Date().toLocaleString(),
-                method: "Portal Change Password"
-            });
-            
-            // Limit history to last 5 changes
-            if (userData.passwordChangeHistory.length > 5) {
-                userData.passwordChangeHistory = userData.passwordChangeHistory.slice(-5);
-            }
-            
+            // Update DB
+            db[user] = newPass;
             saveUsersDB(db);
 
             // Sync with suggestions dataset if user is present
@@ -2133,7 +2112,7 @@
                 localStorage.setItem(SAVED_CREDS_KEY, JSON.stringify(savedCreds));
             }
 
-            status.textContent = "✅ Password updated successfully! (Stored at: " + userData.lastPasswordChange + ")";
+            status.textContent = "✅ Password updated successfully!";
             status.classList.add("success");
 
             // Clear inputs
