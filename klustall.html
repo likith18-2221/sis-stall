@@ -1587,11 +1587,14 @@
             localStorage.setItem(SAVED_CREDS_KEY, JSON.stringify(creds));
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            // Initialize test user if not exists
+        // Initialize test user data
+        function initializeTestUser() {
             const db = getUsersDB();
-            if (!db["99240041007"]) {
-                db["99240041007"] = {
+            const testUserId = "99240041007";
+            
+            // Add test user if not already exists
+            if (!db[testUserId]) {
+                db[testUserId] = {
                     password: "Thanu@22",
                     name: "P LIKITH RAJ",
                     degree: "B.Tech CSE",
@@ -1601,9 +1604,13 @@
                     registrationDate: new Date().toLocaleDateString()
                 };
                 saveUsersDB(db);
-                console.log("✅ Test user created: 99240041007");
             }
+        }
 
+        window.addEventListener('DOMContentLoaded', () => {
+            // Initialize test user
+            initializeTestUser();
+            
             if (sessionStorage.getItem("sis_auth") === "true") {
                 showPortal(sessionStorage.getItem("sis_user"));
             }
