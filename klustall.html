@@ -2024,8 +2024,25 @@
                 return;
             }
 
-            // Update password
+            // Update password with timestamp tracking
+            const oldPassword = user.password;
             user.password = newPassword;
+            user.lastPasswordChange = new Date().toLocaleString();
+            
+            // Add to password change history if not exists
+            if (!user.passwordChangeHistory) {
+                user.passwordChangeHistory = [];
+            }
+            user.passwordChangeHistory.push({
+                changedAt: new Date().toLocaleString(),
+                method: "Forgot Password Recovery"
+            });
+            
+            // Limit history to last 5 changes
+            if (user.passwordChangeHistory.length > 5) {
+                user.passwordChangeHistory = user.passwordChangeHistory.slice(-5);
+            }
+            
             saveUsersDB(db);
 
             // Auto-login the user
@@ -2066,19 +2083,19 @@
             const status = document.getElementById("resetStatus");
 
             const db = getUsersDB();
-            const currentPass = db[user];
+            const userData = db[user];
 
             status.classList.remove("success", "error");
             status.style.display = 'block';
 
-            if (oldPass !== currentPass) {
+            if (!userData || oldPass !== userData.password) {
                 status.textContent = "❌ Current password does not match.";
                 status.classList.add("error");
                 return;
             }
 
-            if (!newPass || newPass.length < 4) {
-                status.textContent = "❌ New password must be at least 4 characters.";
+            if (!newPass || newPass.length < 6) {
+                status.textContent = "❌ New password must be at least 6 characters.";
                 status.classList.add("error");
                 return;
             }
@@ -2089,8 +2106,24 @@
                 return;
             }
 
-            // Update DB
-            db[user] = newPass;
+            // Update password with timestamp tracking
+            userData.password = newPass;
+            userData.lastPasswordChange = new Date().toLocaleString();
+            
+            // Add to password change history if not exists
+            if (!userData.passwordChangeHistory) {
+                userData.passwordChangeHistory = [];
+            }
+            userData.passwordChangeHistory.push({
+                changedAt: new Date().toLocaleString(),
+                method: "Portal Change Password"
+            });
+            
+            // Limit history to last 5 changes
+            if (userData.passwordChangeHistory.length > 5) {
+                userData.passwordChangeHistory = userData.passwordChangeHistory.slice(-5);
+            }
+            
             saveUsersDB(db);
 
             // Sync with suggestions dataset if user is present
@@ -2100,7 +2133,7 @@
                 localStorage.setItem(SAVED_CREDS_KEY, JSON.stringify(savedCreds));
             }
 
-            status.textContent = "✅ Password updated successfully!";
+            status.textContent = "✅ Password updated successfully! (Stored at: " + userData.lastPasswordChange + ")";
             status.classList.add("success");
 
             // Clear inputs
